@@ -60,12 +60,47 @@ window.addEventListener('load', () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     });
 
-    // Save button 
-    document.getElementById('save-btn').addEventListener('click', () => {
+    // Save as PNG button 
+    document.getElementById('save-png').addEventListener('click', () => {
         const dataURL = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = dataURL;
         link.download = 'signature.png';
         link.click();
     });
+
+    // Save as JPG button
+    document.getElementById('save-jpg').addEventListener('click', () => {
+        const dataURL = canvas.toDataURL('image/jpg');
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'signature.jpg';
+        link.click();
+    });
+
+    // Save as PDF button
+
+    document.getElementById('save-pdf').addEventListener('click', () => {
+    // Get canvas data URL in PNG format
+        const canvas = document.getElementById('signature-pad');
+        const imgData = canvas.toDataURL('image/png');
+
+    // Create a new jsPDF instance
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm', 
+            format: 'a4'
+    });
+
+    // Add the image data to the PDF
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+    // Save the generated PDF
+        pdf.save('signature.pdf');
+});
+
 });

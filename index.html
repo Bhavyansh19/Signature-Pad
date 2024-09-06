@@ -3,7 +3,9 @@
 <head>
     <title>Signature Pad</title>
     <link rel="stylesheet" href="styles.css">
+    
 </head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <body>
     <div class="signature-container">
         <h2 class="signature-heading">Please Sign Below</h2>
@@ -11,7 +13,9 @@
         <canvas id="signature-pad" width="600" height="300"></canvas>
         <div class="buttons">
             <button id="clear-btn">Clear</button>
-            <button id="save-btn">Save</button>
+            <button id="save-png">Save as PNG</button>
+            <button id="save-jpg">Save as JPG</button>
+            <button id="save-pdf">Save as PDF</button>
         </div>
     </div>
 
