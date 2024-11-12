@@ -1,13 +1,19 @@
 window.addEventListener('load', () => {
     const canvas = document.getElementById('signature-pad');
     const ctx = canvas.getContext('2d');
+    const lineWidthInput = document.getElementById('line-width');
+    const eraserBtn = document.getElementById('eraser-btn');
+    const penBtn = document.getElementById('pen-btn');
     let isDrawing = false;
+    let isEraser = false;
 
-    ctx.lineWidth = 1.5;
+    // Default pen settings
+    ctx.lineWidth = parseFloat(lineWidthInput.value);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.strokeStyle = '#333';
 
+    // Get the position of the pointer (mouse/touch)
     const getPosition = (e) => {
         const rect = canvas.getBoundingClientRect();
         return {
@@ -16,6 +22,7 @@ window.addEventListener('load', () => {
         };
     };
 
+    // Start drawing
     const startDrawing = (e) => {
         isDrawing = true;
         const pos = getPosition(e);
@@ -23,6 +30,7 @@ window.addEventListener('load', () => {
         ctx.moveTo(pos.x, pos.y);
     };
 
+    // Draw on canvas
     const draw = (e) => {
         if (!isDrawing) return;
         const pos = getPosition(e);
@@ -30,18 +38,38 @@ window.addEventListener('load', () => {
         ctx.stroke();
     };
 
+    // Stop drawing
     const stopDrawing = () => {
         isDrawing = false;
         ctx.closePath();
     };
 
+    // Update line width based on the slider value
+    lineWidthInput.addEventListener('input', () => {
+        ctx.lineWidth = parseFloat(lineWidthInput.value);
+    });
+
+    // Eraser mode
+    eraserBtn.addEventListener('click', () => {
+        isEraser = true;
+        ctx.strokeStyle = '#fff'; // Set stroke color to canvas background (white)
+    });
+
+    // Pen mode
+    penBtn.addEventListener('click', () => {
+        isEraser = false;
+        ctx.strokeStyle = '#333'; // Set stroke color to pen color (dark gray)
+    });
+
+    // Mouse event listeners
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mousemove', draw);
     canvas.addEventListener('mouseup', stopDrawing);
     canvas.addEventListener('mouseout', stopDrawing);
 
+    // Touch event listeners
     canvas.addEventListener('touchstart', (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
         startDrawing(e);
     });
 
@@ -55,12 +83,12 @@ window.addEventListener('load', () => {
         stopDrawing(e);
     });
 
-    // Clear button 
+    // Clear button
     document.getElementById('clear-btn').addEventListener('click', () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     });
 
-    // Save as PNG button 
+    // Save as PNG button
     document.getElementById('save-png').addEventListener('click', () => {
         const dataURL = canvas.toDataURL('image/png');
         const link = document.createElement('a');
@@ -79,28 +107,14 @@ window.addEventListener('load', () => {
     });
 
     // Save as PDF button
-
     document.getElementById('save-pdf').addEventListener('click', () => {
-    // Get canvas data URL in PNG format
-        const canvas = document.getElementById('signature-pad');
         const imgData = canvas.toDataURL('image/png');
-
-    // Create a new jsPDF instance
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm', 
-            format: 'a4'
-    });
-
-    // Add the image data to the PDF
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
         const imgProps = pdf.getImageProperties(imgData);
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-    // Save the generated PDF
         pdf.save('signature.pdf');
-});
-
+    });
 });
